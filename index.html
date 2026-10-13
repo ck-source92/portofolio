@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO & Social Meta Tags -->
+  <title>Dwi Candra</title>
+  <meta name="description"
+    content="Portfolio of Dwi Candra - Technical Artist specializing in real-time rendering, shaders, visual effects, and game engine architecture in Unity & Unreal Engine.">
+  <meta name="author" content="Dwi Candra">
+  <meta name="keywords"
+    content="Dwi Candra, Technical Artist, Game Developer, Real-Time Rendering, Shaders, Visual Effects, Unity, Unreal Engine">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Dwi Candra | Full-Stack Web Developer">
+  <meta property="og:description" content="Explore selected projects, technical skills, and experience by Dwi Candra.">
+  <meta property="og:image" content="assets/images/avatar_2.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/avatar_2.png">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <!-- Font Awesome 6.5.1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Custom Chirpy-Inspired Portfolio Stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=2.0">
+</head>
+
+<body>
+
+  <!-- App Layout Wrapper -->
+  <div class="app-layout">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <!-- ======================================================================
+         1. Left Sticky Sidebar (Chirpy Architecture)
+         ====================================================================== -->
+    <aside id="sidebar" class="sidebar">
+
+      <!-- Profile Header -->
+      <div class="profile-avatar-wrapper">
+        <img id="sidebarAvatar" src="assets/images/avatar_2.png?v=1.1" alt="Dwi Candra" class="profile-avatar">
+        <span class="status-badge" title="Available for opportunities"></span>
+      </div>
+
+      <div class="text-center mb-3">
+        <h1 id="sidebarName" class="site-title">Dwi Candra</h1>
+        <div id="sidebarTitle" class="site-subtitle">Technical Artist || Game Developer</div>
+      </div>
+
+      <!-- Vertical Navigation Menu -->
+      <nav class="w-100">
+        <ul class="sidebar-nav">
+          <li class="nav-item">
+            <a href="#home" class="nav-link active">
+              <i class="fas fa-home"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#categories" class="nav-link">
+              <i class="fas fa-stream"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#archives" class="nav-link">
+              <i class="fas fa-archive"></i>
+              <span>Archives</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Social Footer -->
+      <div class="sidebar-footer">
+        <a id="socialGithub" href="https://github.com/" target="_blank" rel="noopener" class="social-icon-btn"
+          aria-label="GitHub Profile">
+          <i class="fab fa-github"></i>
+        </a>
+        <a id="socialLinkedin" href="https://linkedin.com/" target="_blank" rel="noopener" class="social-icon-btn"
+          aria-label="LinkedIn Profile">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a id="socialEmail" href="mailto:dwicandra.dev@gmail.com" class="social-icon-btn" aria-label="Send Email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ======================================================================
+         2. Main Content Wrapper
+         ====================================================================== -->
+    <main class="main-wrapper">
+
+      <!-- Sticky Topbar Header -->
+      <header class="topbar-wrapper d-flex align-items-center justify-content-between">
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Mobile Sidebar Toggle -->
+          <button id="mobileSidebarToggle" class="sidebar-mobile-toggle" aria-label="Toggle navigation menu">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <!-- Breadcrumb indicator -->
+          <div class="d-flex align-items-center">
+            <span class="breadcrumb-label">PORTFOLIO</span>
+            <span class="text-dim mx-1">/</span>
+            <span id="breadcrumbCurrent" class="breadcrumb-current">Home</span>
+          </div>
+        </div>
+
+        <!-- Topbar Controls (Search & Theme Switcher) -->
+        <div class="d-flex align-items-center gap-2">
+
+          <!-- Search Trigger Button -->
+          <button class="topbar-btn trigger-search-modal" aria-label="Search portfolio">
+            <i class="fas fa-search"></i>
+            <span class="d-none d-sm-inline">Search</span>
+            <span class="kbd-shortcut d-none d-md-inline">Ctrl K</span>
+          </button>
+
+          <!-- Dark/Light Theme Toggle Button -->
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Dark and Light mode">
+            <i id="themeToggleIcon" class="fas fa-sun"></i>
+          </button>
+
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <div class="content-area">
+        <div class="row g-4">
+
+          <!-- Primary Feed (Left / Center Column) -->
+          <div class="col-12 col-xl-9">
+
+
+
+            <!-- ================================================================
+                 Categories Section (Chirpy Style)
+                 ================================================================ -->
+            <section id="categories" class="mb-5 pt-3">
+              <div class="section-header">
+                <h3 class="section-title">
+                  Categories
+                </h3>
+              </div>
+
+              <!-- Container for categories cards -->
+              <div id="categoriesContainer">
+                <!-- Injected dynamically by app.js -->
+              </div>
+            </section>
+
+            <!-- ================================================================
+                 Category Detail View (Displayed when clicking a category name)
+                 ================================================================ -->
+            <section id="categoryDetailView" class="mb-5 pt-3 d-none">
+              <div class="mb-3 d-flex align-items-center justify-content-between">
+                <button class="btn btn-sm btn-outline-secondary" onclick="showCategoriesOverview()">
+                  <i class="fas fa-arrow-left me-1" style="color: #ffffff;"></i> Back to Categories
+                </button>
+                <span id="categoryDetailBreadcrumb" class="font-mono text-dim small"></span>
+              </div>
+
+              <div class="project-card">
+                <h2 id="categoryDetailHeader" class="category-detail-header"></h2>
+                <ul id="categoryDetailPostList" class="list-unstyled mb-0"></ul>
+              </div>
+            </section>
+
+            <!-- ================================================================
+                 Archives Section (Chirpy Style)
+                 ================================================================ -->
+            <section id="archives" class="mb-5 pt-3">
+              <div class="section-header">
+                <h3 class="section-title">
+                  Archives
+                </h3>
+              </div>
+
+              <!-- Container for chronological archives grouped by year -->
+              <div id="archivesContainer">
+                <!-- Injected dynamically by app.js -->
+              </div>
+            </section>
+
+            <!-- ================================================================
+                 Post Reader View (Displayed when clicking an archive link)
+                 ================================================================ -->
+            <section id="postView" class="mb-5 pt-3 d-none">
+              <div class="mb-3 d-flex align-items-center justify-content-between">
+                <button class="btn btn-sm btn-outline-secondary" onclick="showArchivesView()">
+                  <i class="fas fa-arrow-left me-1"></i> Back to Archives
+                </button>
+                <span id="postViewBreadcrumb" class="font-mono text-dim small"></span>
+              </div>
+
+              <article class="post-reader-wrapper">
+                <h1 id="postTitle" class="post-header-title"></h1>
+
+                <div id="postBody" class="post-body"></div>
+
+                <div class="mt-4 pt-3 border-top border-light d-flex justify-content-between align-items-center">
+                  <button class="btn btn-sm btn-outline-secondary" onclick="showArchivesView()">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Archives
+                  </button>
+                  <div id="postTagsList" class="tag-list mb-0"></div>
+                </div>
+              </article>
+            </section>
+
+
+          </div><!-- /col-xl-9 -->
+
+          <!-- ================================================================
+               3. Right Aside Panel (Desktop xl widgets)
+               ================================================================ -->
+          <div class="col-xl-3 d-none d-xl-block">
+            <div class="sticky-top" style="top: 85px; z-index: 1000;">
+
+              <!-- Table of Contents Widget (visible when viewing an article) -->
+              <div id="postTocWidget" class="right-panel-widget d-none">
+                <div class="widget-title">
+                  Contents
+                </div>
+                <div id="postTocList" class="post-toc-list">
+                  <!-- Injected by app.js -->
+                </div>
+              </div>
+
+              <!-- Trending Tech Stack / Tags Cloud -->
+              <div class="right-panel-widget">
+                <div class="widget-title">
+                  Trending Tags
+                </div>
+                <div id="trendingTagsCloud" class="tag-list">
+                  <!-- Injected by app.js -->
+                </div>
+              </div>
+
+            </div>
+          </div><!-- /col-xl-3 -->
+
+        </div>
+      </div><!-- /content-area -->
+
+      <!-- Sticky Follow Footbar -->
+      <footer class="site-footer">
+        <div class="footbar-container">
+
+          <!-- Left: Status & Message in one horizontal line -->
+          <div class="footbar-left">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 flex-shrink-0">
+              <i class="fas fa-circle fa-xs me-1"></i> Available for Hire
+            </span>
+            <div class="d-flex flex-column justify-content-center text-start">
+              <p class="footbar-text">
+                Interested in discussing new projects, collaboration, or full-time roles?
+              </p>
+              <p class="footbar-meta font-mono">
+                &copy; 2026 <strong>Dwi Candra</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Right: Contact CTA Button -->
+          <div class="footbar-right">
+            <a href="mailto:dwicandra.dev@gmail.com"
+              class="btn btn-sm btn-card btn-card-primary px-3 py-2 d-inline-flex align-items-center gap-2">
+              <i class="fas fa-paper-plane"></i> Contact Dwi
+            </a>
+          </div>
+
+        </div>
+      </footer>
+
+    </main><!-- /main-wrapper -->
+
+  </div><!-- /app-layout -->
+
+  <!-- ======================================================================
+       Search Modal (Ctrl+K)
+       ====================================================================== -->
+  <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <div class="w-100 position-relative">
+            <i class="fas fa-search search-icon-wrapper"></i>
+            <input type="text" id="searchInput" class="search-input-field"
+              placeholder="Search..." autocomplete="off">
+          </div>
+          <button type="button" class="btn-close-custom ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body pt-2">
+          <div id="searchResults" class="search-results-box">
+            <div class="p-4 text-center text-dim small">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Project Details Modal
+       ====================================================================== -->
+  <div class="modal fade" id="projectDetailsModal" tabindex="-1" aria-labelledby="projectModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title fs-5 fw-bold" id="projectModalTitle">Project Details</h4>
+          <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body" id="projectModalBody">
+          <!-- Injected dynamically by openProjectModal() -->
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+          <div class="d-flex gap-2">
+            <a id="projectModalCodeBtn" href="#" target="_blank" rel="noopener"
+              class="btn btn-sm btn-outline-secondary">
+              <i class="fab fa-github me-1"></i> Repository
+            </a>
+            <a id="projectModalLiveBtn" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-primary"
+              style="background-color: var(--accent); border-color: var(--accent);">
+              <i class="fas fa-external-link-alt me-1"></i> View Live Site
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3.3 Bundle with Popper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <!-- Modular Portfolio Data -->
+  <script src="js/data/profile.js?v=1.0"></script>
+  <script src="js/data/projects.js?v=1.0"></script>
+  <script src="js/data/posts/unreal-stylized-environment.js?v=1.0"></script>
+  <script src="js/data/posts/unity-wave-effect-shader.js?v=1.1"></script>
+  <script src="js/data/posts/unity-last-beat.js?v=1.0"></script>
+  <script src="js/data.js?v=2.1"></script>
+
+  <!-- Application Logic -->
+  <script src="js/app.js?v=1.5"></script>
+</body>
+
+</html>
