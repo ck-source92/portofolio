@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProjects('all');
   renderCategories();
   renderArchives();
+  renderCertificates();
   renderRightPanel();
   setupFilterTabs();
   setupMobileSidebar();
@@ -300,6 +301,173 @@ function renderCategories() {
   container.innerHTML = html;
 }
 
+/* ==========================================================================
+   4.2 Certificates Rendering & Preview Modal
+   ========================================================================== */
+function renderCertificates() {
+  const container = document.getElementById('certificatesContainer');
+  const countEl = document.getElementById('certificatesCount');
+  if (!container || !portfolioData.certificates) return;
+
+  const certificates = portfolioData.certificates;
+  if (countEl) {
+    countEl.textContent = `${certificates.length} Credentials`;
+  }
+
+  if (certificates.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-5 text-muted col-12">
+        <i class="fas fa-certificate fa-3x mb-3 text-dim"></i>
+        <p>No certificates available at this time.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = certificates.map(cert => {
+    const hasCredential = Boolean(cert.credentialUrl && cert.credentialUrl.trim() !== '' && cert.credentialUrl !== '#');
+    const credentialBtn = hasCredential
+      ? `<a href="${cert.credentialUrl}" target="_blank" rel="noopener noreferrer" class="btn-card btn-card-primary" title="View official credential on external provider">
+          <i class="fas fa-external-link-alt"></i> Show Credential
+        </a>`
+      : `<button class="btn-card disabled opacity-50" disabled title="Credential link not available yet">
+          <i class="fas fa-external-link-alt"></i> Show Credential
+        </button>`;
+
+    return `
+      <article class="cert-card" data-id="${cert.id}">
+        <!-- Certificate Image Preview with Zoom Overlay -->
+        <div class="cert-img-thumb" onclick="openCertificateModal('${cert.id}')" title="Click to preview certificate">
+          <img src="${cert.image}" alt="${cert.title}" loading="lazy">
+          <div class="cert-img-overlay">
+            <span class="cert-img-overlay-badge">
+              <i class="fas fa-search-plus"></i> View Certificate
+            </span>
+          </div>
+        </div>
+
+        <!-- Top Meta (Issuer & Date) -->
+        <div class="card-top-meta">
+          <span class="category-tag cert-issuer-tag">
+            <i class="${cert.issuerIcon || 'fas fa-award'} me-1"></i> ${cert.issuer}
+          </span>
+          ${cert.featured ? `<span class="featured-badge"><i class="fas fa-star"></i> Star</span>` : ''}
+        </div>
+
+        <!-- Title -->
+        <h4 class="cert-title" onclick="openCertificateModal('${cert.id}')">
+          ${cert.title}
+        </h4>
+
+        <!-- Issuer & Date Meta -->
+        <div class="cert-meta-item">
+          <span class="font-mono text-dim"><i class="far fa-calendar-alt me-1"></i> Issued ${cert.issueDate}${cert.expirationDate ? ` • Valid thru ${cert.expirationDate}` : ''}</span>
+        </div>
+
+        ${cert.credentialId ? `
+          <div class="cert-meta-item font-mono text-dim small mb-2">
+            <span>ID: <span class="text-muted">${cert.credentialId}</span></span>
+          </div>
+        ` : ''}
+
+        <!-- Description -->
+        <p class="cert-desc">
+          ${cert.description}
+        </p>
+
+        <!-- Skill Tags -->
+        <div class="tag-list mb-3">
+          ${cert.tags.map(tag => `<span class="tech-tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('')}
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions mt-auto">
+          <div class="action-btn-group ms-auto">
+            ${credentialBtn}
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function openCertificateModal(certId) {
+  const cert = (portfolioData.certificates || []).find(c => c.id === certId);
+  if (!cert) return;
+
+  const modalEl = document.getElementById('certificateModal');
+  if (!modalEl) return;
+
+  const modalTitle = document.getElementById('certificateModalTitle');
+  const modalBadge = document.getElementById('certModalBadge');
+  const modalImage = document.getElementById('certModalImage');
+  const modalIssuer = document.getElementById('certModalIssuer');
+  const modalMeta = document.getElementById('certModalMeta');
+  const directImgBtn = document.getElementById('certModalDirectImgBtn');
+  const credentialBtn = document.getElementById('certModalCredentialBtn');
+
+  if (modalTitle) modalTitle.textContent = cert.title;
+  if (modalBadge) {
+    modalBadge.innerHTML = `<i class="${cert.issuerIcon || 'fas fa-award'} me-1"></i> ${cert.issuer}`;
+  }
+  if (modalImage) {
+    modalImage.src = cert.image;
+    modalImage.alt = cert.title;
+  }
+  if (modalIssuer) modalIssuer.textContent = cert.issuer;
+  if (modalMeta) {
+    let metaText = `Issued: ${cert.issueDate}`;
+    if (cert.expirationDate) metaText += ` | Valid thru: ${cert.expirationDate}`;
+    if (cert.credentialId) metaText += ` | ID: ${cert.credentialId}`;
+    modalMeta.textContent = metaText;
+  }
+  if (directImgBtn) {
+    directImgBtn.href = cert.image;
+  }
+  if (credentialBtn) {
+    const hasCredential = Boolean(cert.credentialUrl && cert.credentialUrl.trim() !== '' && cert.credentialUrl !== '#');
+    if (hasCredential) {
+      credentialBtn.href = cert.credentialUrl;
+      credentialBtn.classList.remove('d-none', 'disabled');
+      credentialBtn.removeAttribute('aria-disabled');
+    } else {
+      credentialBtn.href = '#';
+      credentialBtn.classList.add('disabled');
+      credentialBtn.setAttribute('aria-disabled', 'true');
+    }
+  }
+
+  const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modalInstance.show();
+}
+
+function showCertificatesView() {
+  const postView = document.getElementById('postView');
+  if (postView) postView.classList.add('d-none');
+
+  const catDetailView = document.getElementById('categoryDetailView');
+  if (catDetailView) catDetailView.classList.add('d-none');
+
+  const postTocWidget = document.getElementById('postTocWidget');
+  if (postTocWidget) postTocWidget.classList.add('d-none');
+
+  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
+  mainSections.forEach(sec => sec.classList.remove('d-none'));
+
+  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
+  if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Certificates';
+
+  window.location.hash = '#certificates';
+  document.getElementById('certificates')?.scrollIntoView({ behavior: 'smooth' });
+
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#certificates') {
+      link.classList.add('active');
+    }
+  });
+}
+
 /**
  * Open a specific category view (matching https://rito15.github.io/categories/unity/)
  */
@@ -311,7 +479,7 @@ function openCategory(categoryName) {
   );
 
   // Hide other views
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #postView');
+  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates, #postView');
   mainSections.forEach(sec => sec.classList.add('d-none'));
 
   const postTocWidget = document.getElementById('postTocWidget');
@@ -372,7 +540,7 @@ function showCategoriesOverview() {
   const postTocWidget = document.getElementById('postTocWidget');
   if (postTocWidget) postTocWidget.classList.add('d-none');
 
-  const mainSections = document.querySelectorAll('#home, #categories, #archives');
+  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
   mainSections.forEach(sec => sec.classList.remove('d-none'));
 
   const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
@@ -397,7 +565,7 @@ function openPost(postId) {
   if (!post) return;
 
   // Hide other sections & category detail view
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #categoryDetailView');
+  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates, #categoryDetailView');
   mainSections.forEach(sec => sec.classList.add('d-none'));
 
   // Show Post Reader view
@@ -495,7 +663,7 @@ function showArchivesView() {
   if (postTocWidget) postTocWidget.classList.add('d-none');
 
   // Unhide main sections
-  const mainSections = document.querySelectorAll('#home, #categories, #archives');
+  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
   mainSections.forEach(sec => sec.classList.remove('d-none'));
 
   const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
@@ -533,6 +701,8 @@ function checkHashRoute() {
     showCategoriesOverview();
   } else if (hash === '#archives') {
     showArchivesView();
+  } else if (hash === '#certificates') {
+    showCertificatesView();
   } else {
     // If navigating back to #home, #projects, #about, or root
     const postView = document.getElementById('postView');
@@ -542,7 +712,7 @@ function checkHashRoute() {
       if (postView) postView.classList.add('d-none');
       if (catDetailView) catDetailView.classList.add('d-none');
       if (postTocWidget) postTocWidget.classList.add('d-none');
-      document.querySelectorAll('#home, #categories, #archives').forEach(sec => sec.classList.remove('d-none'));
+      document.querySelectorAll('#home, #categories, #archives, #certificates').forEach(sec => sec.classList.remove('d-none'));
     }
   }
 }
@@ -563,6 +733,13 @@ function renderRightPanel() {
   if (portfolioData.archives) {
     portfolioData.archives.forEach(p => {
       p.tags.forEach(t => {
+        tagCounts[t] = (tagCounts[t] || 0) + 1;
+      });
+    });
+  }
+  if (portfolioData.certificates) {
+    portfolioData.certificates.forEach(c => {
+      c.tags.forEach(t => {
         tagCounts[t] = (tagCounts[t] || 0) + 1;
       });
     });
@@ -640,7 +817,14 @@ function setupSearchModal() {
       a.tags.some(t => t.toLowerCase().includes(query))
     );
 
-    if (matchedProjects.length === 0 && matchedArchives.length === 0) {
+    const matchedCertificates = (portfolioData.certificates || []).filter(c =>
+      c.title.toLowerCase().includes(query) ||
+      c.issuer.toLowerCase().includes(query) ||
+      c.description.toLowerCase().includes(query) ||
+      c.tags.some(t => t.toLowerCase().includes(query))
+    );
+
+    if (matchedProjects.length === 0 && matchedArchives.length === 0 && matchedCertificates.length === 0) {
       searchResults.innerHTML = `<div class="p-3 text-center text-muted">No results found for "${query}"</div>`;
       return;
     }
@@ -672,6 +856,19 @@ function setupSearchModal() {
       });
     }
 
+    if (matchedCertificates.length > 0) {
+      html += `<div class="text-dim small text-uppercase font-mono px-2 mt-3 mb-1">Certificates (${matchedCertificates.length})</div>`;
+      matchedCertificates.forEach(c => {
+        html += `
+          <div class="search-result-item" onclick="selectCertificateSearchResult('${c.id}')">
+            <div class="fw-bold text-heading"><i class="fas fa-certificate text-accent me-1"></i> ${highlightText(c.title, query)}</div>
+            <div class="small text-muted text-truncate">${highlightText(c.description, query)}</div>
+            <div class="mt-1 font-mono text-dim" style="font-size: 0.72rem;">${c.issuer} • ${c.issueDate} • Tags: ${c.tags.join(', ')}</div>
+          </div>
+        `;
+      });
+    }
+
     searchResults.innerHTML = html;
   });
 }
@@ -694,6 +891,16 @@ function selectArchiveSearchResult(archiveId) {
   const modalInstance = bootstrap.Modal.getInstance(searchModalEl);
   if (modalInstance) modalInstance.hide();
   openPost(archiveId);
+}
+
+function selectCertificateSearchResult(certId) {
+  const searchModalEl = document.getElementById('searchModal');
+  const modalInstance = bootstrap.Modal.getInstance(searchModalEl);
+  if (modalInstance) modalInstance.hide();
+  showCertificatesView();
+  setTimeout(() => {
+    openCertificateModal(certId);
+  }, 400);
 }
 
 /* ==========================================================================

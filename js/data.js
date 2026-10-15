@@ -18,5 +18,9 @@ const portfolioData = {
   },
   get archives() {
     return window.posts || [];
+  },
+  get certificates() {
+    return window.certificatesData || [];
   }
 };
+
