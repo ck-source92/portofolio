@@ -348,7 +348,7 @@ function renderCertificates() {
 
         <!-- Top Meta (Issuer & Date) -->
         <div class="card-top-meta">
-          <span class="category-tag cert-issuer-tag">
+          <span class="cert-issuer-text">
             <i class="${cert.issuerIcon || 'fas fa-award'} me-1"></i> ${cert.issuer}
           </span>
           ${cert.featured ? `<span class="featured-badge"><i class="fas fa-star"></i> Star</span>` : ''}

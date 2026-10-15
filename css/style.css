@@ -1681,32 +1681,46 @@ a:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Certificate Issuer Tag - Explicit White in Dark Mode */
+/* Certificate Issuer - Plain Text & Icon (No Background / Box) */
+.cert-issuer-text,
 .cert-card .category-tag,
-.cert-issuer-tag,
-#certModalBadge {
+.cert-issuer-tag {
   color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
 }
 
+.cert-issuer-text i,
 .cert-card .category-tag i,
-.cert-issuer-tag i,
-#certModalBadge i {
+.cert-issuer-tag i {
   color: #ffffff !important;
 }
 
+[data-theme="light"] .cert-issuer-text,
 [data-theme="light"] .cert-card .category-tag,
-[data-theme="light"] .cert-issuer-tag,
-[data-theme="light"] #certModalBadge {
+[data-theme="light"] .cert-issuer-tag {
   color: var(--accent) !important;
-  background-color: var(--accent-light);
-  border: 1px solid transparent;
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
+[data-theme="light"] .cert-issuer-text i,
 [data-theme="light"] .cert-card .category-tag i,
-[data-theme="light"] .cert-issuer-tag i,
-[data-theme="light"] #certModalBadge i {
+[data-theme="light"] .cert-issuer-tag i {
   color: var(--accent) !important;
 }
 
