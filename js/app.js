@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   renderProfile();
-  renderProjects('all');
+  renderHomeFeed(1);
   renderCategories();
   renderArchives();
   renderCertificates();
@@ -77,7 +77,11 @@ function renderProfile() {
 
   if (socialGithub) socialGithub.href = profile.socials.github;
   if (socialLinkedin) socialLinkedin.href = profile.socials.linkedin;
-  if (socialEmail) socialEmail.href = profile.socials.email;
+  if (socialEmail && profile.socials?.email) {
+    socialEmail.href = profile.socials.email.startsWith('mailto:')
+      ? profile.socials.email
+      : `mailto:${profile.socials.email}`;
+  }
   if (socialTwitter) socialTwitter.href = profile.socials.twitter;
 
   // Hero Section
@@ -441,35 +445,240 @@ function openCertificateModal(certId) {
   modalInstance.show();
 }
 
-function showCertificatesView() {
-  const postView = document.getElementById('postView');
-  if (postView) postView.classList.add('d-none');
+/* ==========================================================================
+   5. SPA Page Navigation & Isolated View Switching
+   ========================================================================== */
+const ALL_VIEWS = ['home', 'categories', 'categoryDetailView', 'archives', 'certificates', 'postView'];
+let currentActiveView = 'home';
+let previousViewBeforePost = 'home';
+let currentCategoryBeforePost = '';
+let currentHomeFeedPage = 1;
+const POSTS_PER_PAGE = 4;
 
-  const catDetailView = document.getElementById('categoryDetailView');
-  if (catDetailView) catDetailView.classList.add('d-none');
+/**
+ * Switch view to isolate a single page section and hide all other views
+ */
+function switchView(viewName) {
+  currentActiveView = viewName;
 
+  ALL_VIEWS.forEach(v => {
+    const el = document.getElementById(v);
+    if (el) {
+      if (v === viewName) {
+        el.classList.remove('d-none');
+      } else {
+        el.classList.add('d-none');
+      }
+    }
+  });
+
+  // Table of Contents widget in right panel is only displayed for postView
   const postTocWidget = document.getElementById('postTocWidget');
-  if (postTocWidget) postTocWidget.classList.add('d-none');
+  if (postTocWidget) {
+    if (viewName === 'postView') {
+      postTocWidget.classList.remove('d-none');
+    } else {
+      postTocWidget.classList.add('d-none');
+    }
+  }
 
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
-  mainSections.forEach(sec => sec.classList.remove('d-none'));
-
-  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
-  if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Certificates';
-
-  window.location.hash = '#certificates';
-  document.getElementById('certificates')?.scrollIntoView({ behavior: 'smooth' });
+  // Determine which sidebar link should be highlighted
+  let navTarget = viewName;
+  if (viewName === 'categoryDetailView') {
+    navTarget = 'categories';
+  } else if (viewName === 'postView') {
+    navTarget = (previousViewBeforePost === 'categoryDetail') ? 'categories' : previousViewBeforePost;
+  }
 
   document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
     link.classList.remove('active');
-    if (link.getAttribute('href') === '#certificates') {
+    const href = link.getAttribute('href');
+    if (href === `#${navTarget}`) {
       link.classList.add('active');
     }
   });
+
+  // Update Topbar Breadcrumb indicator
+  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
+  if (breadcrumbCurrent) {
+    if (viewName === 'home') breadcrumbCurrent.textContent = 'Home';
+    else if (viewName === 'categories') breadcrumbCurrent.textContent = 'Categories';
+    else if (viewName === 'archives') breadcrumbCurrent.textContent = 'Archives';
+    else if (viewName === 'certificates') breadcrumbCurrent.textContent = 'Certificates';
+  }
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 /**
- * Open a specific category view (matching https://rito15.github.io/categories/unity/)
+ * Navigate to a specific top-level page from sidebar or links
+ */
+function navigateToPage(pageName) {
+  window.location.hash = `#${pageName}`;
+  switchView(pageName);
+  if (pageName === 'home') {
+    renderHomeFeed(currentHomeFeedPage);
+  } else if (pageName === 'categories') {
+    renderCategories();
+  } else if (pageName === 'archives') {
+    renderArchives();
+  } else if (pageName === 'certificates') {
+    renderCertificates();
+  }
+}
+
+/**
+ * Render Home Page Blog Feed with Chirpy-style Post Previews and Pagination
+ */
+function renderHomeFeed(page = 1) {
+  const feedContainer = document.getElementById('homePostsFeed');
+  const paginationContainer = document.getElementById('homePagination');
+  if (!feedContainer || !portfolioData.archives) return;
+
+  currentHomeFeedPage = page;
+
+  // Sort posts: pinned first, then newest date first
+  const sortedPosts = [...portfolioData.archives].sort((a, b) => {
+    if (Boolean(b.pinned) !== Boolean(a.pinned)) {
+      return b.pinned ? 1 : -1;
+    }
+    const dateA = new Date(a.date || '1970-01-01');
+    const dateB = new Date(b.date || '1970-01-01');
+    return dateB - dateA;
+  });
+
+  const totalPosts = sortedPosts.length;
+  const totalPages = Math.max(1, Math.ceil(totalPosts / POSTS_PER_PAGE));
+
+  if (page < 1) page = 1;
+  if (page > totalPages) page = totalPages;
+
+  const startIndex = (page - 1) * POSTS_PER_PAGE;
+  const pagePosts = sortedPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+
+  if (pagePosts.length === 0) {
+    feedContainer.innerHTML = `
+      <div class="text-center py-5 text-muted">
+        <i class="far fa-newspaper fa-3x mb-3 text-dim"></i>
+        <p>No blog posts found.</p>
+      </div>
+    `;
+    if (paginationContainer) paginationContainer.innerHTML = '';
+    return;
+  }
+
+  // Render .post-preview cards
+  feedContainer.innerHTML = pagePosts.map(post => {
+    const excerpt = post.summary || stripHtmlTags(post.content).slice(0, 200) + '...';
+
+    return `
+      <div class="post-preview">
+        <h1>
+          <a href="#post/${post.id}" onclick="openPost('${post.id}'); return false;">${post.title}</a>
+        </h1>
+
+        <div class="post-content">
+          <p>${excerpt}</p>
+        </div>
+
+        <div class="post-meta text-muted d-flex justify-content-between align-items-center">
+          <div>
+            <!-- posted date -->
+            <i class="far fa-calendar fa-fw"></i>
+            <span class="timeago" title="${post.month} ${post.day}, ${post.year}">
+              ${post.month} ${post.day}, ${post.year}
+            </span>
+
+            <!-- time to read -->
+            <i class="far fa-clock fa-fw ms-2"></i>
+            <span class="readtime">${post.readTime || '5 min'}</span>
+
+            <!-- category badge / link -->
+            <i class="far fa-folder-open fa-fw ms-2"></i>
+            <a class="post-cat-link" onclick="openCategory('${post.category}'); return false;">${post.category}</a>
+          </div>
+
+          ${post.pinned ? `
+          <div class="pin">
+            <i class="fas fa-thumbtack fa-fw"></i>
+            <span>Pinned</span>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Render Chirpy numbered pagination
+  if (paginationContainer) {
+    let paginationHtml = '<ul class="custom-pagination">';
+
+    // Previous Page Button (<)
+    if (page > 1) {
+      paginationHtml += `
+        <li class="page-item">
+          <a class="page-link" href="#home" onclick="goToHomeFeedPage(${page - 1}); return false;" aria-label="Previous">&laquo;</a>
+        </li>
+      `;
+    } else {
+      paginationHtml += `
+        <li class="page-item disabled">
+          <span class="page-link" aria-label="Previous">&laquo;</span>
+        </li>
+      `;
+    }
+
+    // Numbered Page Buttons
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === page) {
+        paginationHtml += `
+          <li class="page-item active">
+            <span class="page-link">${p}</span>
+          </li>
+        `;
+      } else {
+        paginationHtml += `
+          <li class="page-item">
+            <a class="page-link" href="#home" onclick="goToHomeFeedPage(${p}); return false;">${p}</a>
+          </li>
+        `;
+      }
+    }
+
+    // Next Page Button (>)
+    if (page < totalPages) {
+      paginationHtml += `
+        <li class="page-item">
+          <a class="page-link" href="#home" onclick="goToHomeFeedPage(${page + 1}); return false;" aria-label="Next">&raquo;</a>
+        </li>
+      `;
+    } else {
+      paginationHtml += `
+        <li class="page-item disabled">
+          <span class="page-link" aria-label="Next">&raquo;</span>
+        </li>
+      `;
+    }
+
+    paginationHtml += '</ul>';
+    paginationContainer.innerHTML = paginationHtml;
+  }
+}
+
+function goToHomeFeedPage(page) {
+  renderHomeFeed(page);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function stripHtmlTags(html) {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+/**
+ * Open a specific category view
  */
 function openCategory(categoryName) {
   if (!portfolioData.archives) return;
@@ -478,15 +687,8 @@ function openCategory(categoryName) {
     p.category.toLowerCase() === categoryName.toLowerCase()
   );
 
-  // Hide other views
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates, #postView');
-  mainSections.forEach(sec => sec.classList.add('d-none'));
-
-  const postTocWidget = document.getElementById('postTocWidget');
-  if (postTocWidget) postTocWidget.classList.add('d-none');
-
-  const catDetailView = document.getElementById('categoryDetailView');
-  if (catDetailView) catDetailView.classList.remove('d-none');
+  currentCategoryBeforePost = categoryName;
+  switchView('categoryDetailView');
 
   const catHeader = document.getElementById('categoryDetailHeader');
   const catBreadcrumb = document.getElementById('categoryDetailBreadcrumb');
@@ -516,45 +718,13 @@ function openCategory(categoryName) {
   if (breadcrumbCurrent) breadcrumbCurrent.textContent = categoryName;
 
   window.location.hash = `#category/${encodeURIComponent(categoryName.toLowerCase())}`;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Update active sidebar nav
-  document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === '#categories') {
-      link.classList.add('active');
-    }
-  });
 }
 
 /**
  * Return from category detail view back to main categories overview
  */
 function showCategoriesOverview() {
-  const catDetailView = document.getElementById('categoryDetailView');
-  if (catDetailView) catDetailView.classList.add('d-none');
-
-  const postView = document.getElementById('postView');
-  if (postView) postView.classList.add('d-none');
-
-  const postTocWidget = document.getElementById('postTocWidget');
-  if (postTocWidget) postTocWidget.classList.add('d-none');
-
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
-  mainSections.forEach(sec => sec.classList.remove('d-none'));
-
-  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
-  if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Categories';
-
-  window.location.hash = '#categories';
-  document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
-
-  document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === '#categories') {
-      link.classList.add('active');
-    }
-  });
+  navigateToPage('categories');
 }
 
 /**
@@ -564,17 +734,28 @@ function openPost(postId) {
   const post = portfolioData.archives.find(p => p.id === postId);
   if (!post) return;
 
-  // Hide other sections & category detail view
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates, #categoryDetailView');
-  mainSections.forEach(sec => sec.classList.add('d-none'));
+  if (currentActiveView !== 'postView') {
+    if (currentActiveView === 'categoryDetailView') {
+      previousViewBeforePost = 'categoryDetail';
+    } else {
+      previousViewBeforePost = currentActiveView || 'home';
+    }
+  }
 
-  // Show Post Reader view
-  const postView = document.getElementById('postView');
-  if (postView) postView.classList.remove('d-none');
+  switchView('postView');
 
-  // Show Table of Contents widget in right panel
-  const postTocWidget = document.getElementById('postTocWidget');
-  if (postTocWidget) postTocWidget.classList.remove('d-none');
+  // Update Back button text based on previous view
+  const postBackBtnText = document.getElementById('postBackBtnText');
+  const postBottomBackBtnText = document.getElementById('postBottomBackBtnText');
+  let backLabel = 'Back';
+  if (previousViewBeforePost === 'home') backLabel = 'Back to Home';
+  else if (previousViewBeforePost === 'archives') backLabel = 'Back to Archives';
+  else if (previousViewBeforePost === 'categoryDetail' && currentCategoryBeforePost) backLabel = `Back to ${currentCategoryBeforePost}`;
+  else if (previousViewBeforePost === 'categories') backLabel = 'Back to Categories';
+  else if (previousViewBeforePost === 'certificates') backLabel = 'Back to Certificates';
+
+  if (postBackBtnText) postBackBtnText.textContent = backLabel;
+  if (postBottomBackBtnText) postBottomBackBtnText.textContent = backLabel;
 
   // Populate Post Header & Meta
   const postTitle = document.getElementById('postTitle');
@@ -638,7 +819,7 @@ function openPost(postId) {
 
   // Populate Tags
   if (postTagsList) {
-    postTagsList.innerHTML = post.tags.map(t => `<span class="tech-tag">${t}</span>`).join('');
+    postTagsList.innerHTML = post.tags.map(t => `<span class="tech-tag" onclick="filterByTag('${t}')">${t}</span>`).join('');
   }
 
   // Update Breadcrumb & URL hash
@@ -646,46 +827,44 @@ function openPost(postId) {
   if (breadcrumbCurrent) breadcrumbCurrent.textContent = post.title;
 
   window.location.hash = `#post/${post.id}`;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /**
- * Return from Post Reader back to Archives / Home view
+ * Return from Post Reader back to previous view (Home, Archives, Category, etc.)
+ */
+function navigateBackFromPost() {
+  if (previousViewBeforePost === 'categoryDetail' && currentCategoryBeforePost) {
+    openCategory(currentCategoryBeforePost);
+  } else if (previousViewBeforePost === 'archives') {
+    navigateToPage('archives');
+  } else if (previousViewBeforePost === 'categories') {
+    navigateToPage('categories');
+  } else if (previousViewBeforePost === 'certificates') {
+    navigateToPage('certificates');
+  } else {
+    navigateToPage('home');
+  }
+}
+
+/**
+ * Show Archives view
  */
 function showArchivesView() {
-  const postView = document.getElementById('postView');
-  if (postView) postView.classList.add('d-none');
-
-  const catDetailView = document.getElementById('categoryDetailView');
-  if (catDetailView) catDetailView.classList.add('d-none');
-
-  const postTocWidget = document.getElementById('postTocWidget');
-  if (postTocWidget) postTocWidget.classList.add('d-none');
-
-  // Unhide main sections
-  const mainSections = document.querySelectorAll('#home, #categories, #archives, #certificates');
-  mainSections.forEach(sec => sec.classList.remove('d-none'));
-
-  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
-  if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Archives';
-
-  window.location.hash = '#archives';
-  document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
-
-  // Update active sidebar nav item
-  document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === '#archives') {
-      link.classList.add('active');
-    }
-  });
+  navigateToPage('archives');
 }
 
 /**
- * Check URL hash to support direct link navigation (e.g. #category/unity or #post/unity-upscale-sampling)
+ * Show Certificates view
+ */
+function showCertificatesView() {
+  navigateToPage('certificates');
+}
+
+/**
+ * Check URL hash to support direct link navigation
  */
 function checkHashRoute() {
-  const hash = window.location.hash;
+  const hash = window.location.hash || '#home';
   if (hash.startsWith('#post/')) {
     const postId = hash.replace('#post/', '');
     openPost(postId);
@@ -695,25 +874,19 @@ function checkHashRoute() {
       const found = portfolioData.archives.find(p => p.category.toLowerCase() === catSlug.toLowerCase());
       if (found) {
         openCategory(found.category);
+      } else {
+        navigateToPage('categories');
       }
     }
   } else if (hash === '#categories') {
-    showCategoriesOverview();
+    navigateToPage('categories');
   } else if (hash === '#archives') {
-    showArchivesView();
+    navigateToPage('archives');
   } else if (hash === '#certificates') {
-    showCertificatesView();
+    navigateToPage('certificates');
   } else {
-    // If navigating back to #home, #projects, #about, or root
-    const postView = document.getElementById('postView');
-    const catDetailView = document.getElementById('categoryDetailView');
-    const postTocWidget = document.getElementById('postTocWidget');
-    if ((postView && !postView.classList.contains('d-none')) || (catDetailView && !catDetailView.classList.contains('d-none'))) {
-      if (postView) postView.classList.add('d-none');
-      if (catDetailView) catDetailView.classList.add('d-none');
-      if (postTocWidget) postTocWidget.classList.add('d-none');
-      document.querySelectorAll('#home, #categories, #archives, #certificates').forEach(sec => sec.classList.remove('d-none'));
-    }
+    // Default to Home
+    navigateToPage('home');
   }
 }
 
@@ -987,10 +1160,6 @@ function setupMobileSidebar() {
    10. ScrollSpy & Navigation Active State
    ========================================================================== */
 function setupScrollSpy() {
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
-  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
-
   window.addEventListener('scroll', () => {
     // If post reader is active, update active heading in Contents (TOC)
     const postView = document.getElementById('postView');
@@ -1017,30 +1186,6 @@ function setupScrollSpy() {
           });
         }
       }
-      return;
-    }
-
-    let currentId = '';
-    const scrollPos = window.scrollY + 120;
-
-    sections.forEach(sec => {
-      const top = sec.offsetTop;
-      const height = sec.offsetHeight;
-      if (scrollPos >= top && scrollPos < top + height) {
-        currentId = sec.getAttribute('id');
-      }
-    });
-
-    if (currentId) {
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${currentId}`) {
-          link.classList.add('active');
-          if (breadcrumbCurrent) {
-            breadcrumbCurrent.textContent = link.querySelector('span')?.textContent || 'Home';
-          }
-        }
-      });
     }
   });
 }
