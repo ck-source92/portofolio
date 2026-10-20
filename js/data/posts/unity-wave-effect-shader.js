@@ -26,7 +26,7 @@ window.posts.push({
 
     <h2 id="preview">2. Preview</h2>
     <hr />
-    <p>Check out the showcase video on YouTube: <a href="https://www.youtube.com/watch?v=XBnlkvSIOMw" target="_blank" rel="noopener" class="post-link text-accent fw-medium">Wave Effect - Unity Water Shader <i class="fas fa-external-link-alt fa-xs ms-1"></i></a></p>
+    <p>Check out the showcase video on YouTube: <a href="https://youtu.be/XBnlkvSIOMw" target="_blank" rel="noopener" class="post-link text-accent fw-medium">Wave Effect - Unity Water Shader <i class="fas fa-external-link-alt fa-xs ms-1"></i></a></p>
     <div class="ratio ratio-16x9 my-3">
       <iframe src="https://www.youtube.com/embed/XBnlkvSIOMw" title="Wave Effect - Unity Water Shader" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
     </div>

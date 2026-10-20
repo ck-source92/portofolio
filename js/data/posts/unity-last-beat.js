@@ -10,7 +10,7 @@ window.posts.push({
   date: "2023-08-25",
   day: "25",
   month: "Aug",
-  category: "Game Development",
+  category: "Unity",
   readTime: "8 min",
   tags: ["Unity", "C#", "Fuzzy Logic", "2D Platformer", "Rhythm Game"],
   summary: "Pengatur lagu otomatis menggunakan logika fuzzy pada game musik berbasis 2D platformer (Automatic song arranger using fuzzy logic in a 2D platformer music game).",

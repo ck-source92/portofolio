@@ -6,7 +6,7 @@ window.profileData = {
   name: "Dwi Candra",
   title: "Technical Artist || Game Developer",
   bio: "Specializing in real-time rendering, shaders, visual effects, and game engine architecture in Unity & Unreal Engine.",
-  avatar: "assets/images/avatar_2.png?v=1.1",
+  avatar: "assets/images/avatar_2.png?v=2.1",
   location: "Indonesia",
   status: "Open to Opportunities",
   socials: {
