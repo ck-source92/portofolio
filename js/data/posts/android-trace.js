@@ -30,6 +30,10 @@ window.posts.push({
       It is an Android application combining location-based discovery, community social sharing, and gamified exploration missions. The platform allows users to explore nearby happenings and share experiences directly on an interactive map.
     </p>
 
+    <p>
+      Check out the project showcase on Canva: <a href="https://canva.link/a10oskbcjasdue3" target="_blank" rel="noopener" class="post-link text-accent fw-medium">Bangkit 2022 Capstone Project Showcase <i class="fas fa-external-link-alt fa-xs ms-1"></i></a>
+    </p>
+
     <div class="doc-download-box my-3 p-3 border d-flex align-items-center justify-content-between flex-wrap gap-3">
       <div class="d-flex align-items-center gap-3">
         <i class="fas fa-map-marked-alt fa-2x text-primary"></i>
@@ -38,9 +42,12 @@ window.posts.push({
           <div class="doc-download-subtitle small text-muted">Bangkit Academy 2022 Capstone Project</div>
         </div>
       </div>
-      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
-        <i class="fab fa-android me-1"></i> Android &amp; Kotlin
-      </span>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="https://canva.link/a10oskbcjasdue3" target="_blank" rel="noopener" class="btn btn-sm doc-download-btn d-inline-flex align-items-center gap-2">
+          <i class="fas fa-external-link-alt"></i>
+          <span>Bangkit 2022 Capstone Project Showcase</span>
+        </a>
+      </div>
     </div>
 
     <h2 id="app-flow">2. Application Flow &amp; Architecture</h2>
