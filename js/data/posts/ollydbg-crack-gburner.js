@@ -25,7 +25,7 @@ window.posts.push({
       An undergraduate assignment demonstrating binary reverse engineering and dynamic analysis on <strong>gBurner</strong> using <strong>OllyDbg</strong> (an x86 32-bit assembler level analyzing debugger).
     </p>
     <p>
-      Running in a Windows 7 32-bit environment, the objective was to inspect the software's execution flow, locate registration validation routines, analyze assembly instructions (such as conditional jumps and comparisons), and patch the binary to bypass licensing limitations and achieve full application access.
+      Running in a Windows 7 32-bit environments, the objective was to inspect the software's execution flow, locate registration validation routines, analyze assembly instructions (such as conditional jumps and comparisons), and patch the binary to bypass licensing limitations and achieve full application access.
     </p>
 
     <h2 id="preview">2. Preview</h2>
